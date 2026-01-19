@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Exploration, Country } from '../types';
-import { COUNTRIES } from '../constants';
+import { COUNTRIES } from '../data/facts';
 
 interface ToggleSwitchProps {
   id: string;

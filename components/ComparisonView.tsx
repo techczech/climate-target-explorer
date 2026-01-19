@@ -4,7 +4,7 @@ import { marked } from 'marked';
 import { Exploration } from '../types';
 import { calculateTargets } from '../utils/calculations';
 import { LifestyleGuide } from './LifestyleGuide';
-import { COUNTRIES } from '../constants';
+import { COUNTRIES } from '../data/facts';
 
 interface ComparisonViewProps {
   explorations: Exploration[];
@@ -74,9 +74,7 @@ const ExplorationColumn: React.FC<{ exploration: Exploration }> = ({ exploration
             {exploration.stories.length > 0 ? exploration.stories.map(story => (
               <div key={story.id} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
                 <span className="text-sm font-semibold px-2 py-1 bg-teal-100 text-teal-800 rounded mb-2 inline-block">{story.genre}</span>
-                {/* FIX: Use marked.parseSync for synchronous conversion needed by React. */}
-                {/* FIX: The method `parseSync` does not exist on the imported `marked` object. Using `marked.parse` instead. */}
-                <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: marked.parse(story.text) }} />
+                <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: marked.parse(story.text) as string }} />
               </div>
             )) : <p className="text-center text-slate-500 py-4">No stories generated.</p>}
         </div>

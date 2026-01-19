@@ -1,7 +1,7 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Exploration, GeneratedStory } from '../types';
-
-const LOCAL_STORAGE_KEY = 'climateExplorations';
+import { storageService } from '../services/storageService';
 
 const createDefaultExploration = (): Exploration => ({
   id: crypto.randomUUID(),
@@ -17,32 +17,26 @@ export const useExplorations = () => {
   const [explorations, setExplorations] = useState<Exploration[]>([]);
   const [activeExplorationId, setActiveExplorationId] = useState<string | null>(null);
 
+  // Initial Load
   useEffect(() => {
-    try {
-      const storedItems = localStorage.getItem(LOCAL_STORAGE_KEY);
-      const items = storedItems ? JSON.parse(storedItems) : [];
-      if (items.length > 0) {
-        setExplorations(items);
-        setActiveExplorationId(items[0].id);
-      } else {
-        const defaultExploration = createDefaultExploration();
-        setExplorations([defaultExploration]);
-        setActiveExplorationId(defaultExploration.id);
-      }
-    } catch (error) {
-      console.error("Failed to load explorations from local storage", error);
-      const defaultExploration = createDefaultExploration();
-      setExplorations([defaultExploration]);
-      setActiveExplorationId(defaultExploration.id);
+    const loaded = storageService.load();
+    if (loaded.length > 0) {
+      setExplorations(loaded);
+      setActiveExplorationId(loaded[0].id);
+    } else {
+      const defaultExp = createDefaultExploration();
+      setExplorations([defaultExp]);
+      setActiveExplorationId(defaultExp.id);
     }
   }, []);
 
+  // Persistence
   useEffect(() => {
     if (explorations.length > 0) {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(explorations));
+      storageService.save(explorations);
     }
   }, [explorations]);
-  
+
   const activeExploration = explorations.find(e => e.id === activeExplorationId) || explorations[0] || createDefaultExploration();
 
   const updateActiveExploration = useCallback((updatedData: Partial<Exploration>) => {
@@ -60,7 +54,6 @@ export const useExplorations = () => {
       )
     );
   }, []);
-
 
   const createNewExploration = useCallback(() => {
     const newExploration: Exploration = {
@@ -104,37 +97,19 @@ export const useExplorations = () => {
     );
   }, []);
 
-
-  const importExplorations = useCallback((file: File) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const text = event.target?.result;
-        if (typeof text !== 'string') throw new Error("File content is not a string");
-        const imported = JSON.parse(text);
-        if (Array.isArray(imported)) { // Add more robust validation here if needed
-          setExplorations(imported);
-          setActiveExplorationId(imported[0]?.id || null);
-        }
-      } catch (error) {
-        console.error("Failed to import explorations:", error);
-        alert("Invalid file format. Please upload a valid explorations JSON file.");
-      }
-    };
-    reader.readAsText(file);
+  const importExplorations = useCallback(async (file: File) => {
+    try {
+      const imported = await storageService.importFromFile(file);
+      setExplorations(imported);
+      setActiveExplorationId(imported[0]?.id || null);
+    } catch (error) {
+      console.error("Import failed:", error);
+      alert("Failed to import explorations. Please check the file format.");
+    }
   }, []);
 
   const exportExplorations = useCallback(() => {
-    const dataStr = JSON.stringify(explorations, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `climate-explorations-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    storageService.exportToFile(explorations);
   }, [explorations]);
 
   return {

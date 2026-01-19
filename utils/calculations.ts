@@ -1,5 +1,7 @@
+
 import { Exploration } from '../types';
-import { OVERALL_TARGET, FOOTPRINT_BREAKDOWN, STRUCTURAL_REDUCTION_FACTORS, COUNTRIES } from '../constants';
+import { OVERALL_TARGET, FOOTPRINT_BREAKDOWN, STRUCTURAL_REDUCTION_FACTORS } from '../config/model';
+import { COUNTRIES } from '../data/facts';
 
 export function calculateTargets(exploration: Exploration) {
   const country = COUNTRIES.find(c => c.code === exploration.countryCode);

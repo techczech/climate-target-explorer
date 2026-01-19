@@ -1,7 +1,9 @@
+
 import React, { useState, useMemo, useCallback } from 'react';
 import { useExplorations } from './hooks/useExplorations';
 import { Exploration, GeneratedStory } from './types';
-import { COUNTRIES, OVERALL_TARGET } from './constants';
+import { COUNTRIES } from './data/facts';
+import { OVERALL_TARGET } from './config/model';
 import { calculateTargets } from './utils/calculations';
 import { ExplorationManager } from './components/ExplorationManager';
 import { Controls } from './components/Controls';
