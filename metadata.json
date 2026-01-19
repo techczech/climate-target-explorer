@@ -1,0 +1,5 @@
+{
+  "name": "Collective Climate Target Explorer",
+  "description": "An interactive web application to explore personal and collective carbon footprint targets required to meet the 1.5°C climate goal. Users can adjust parameters like country, structural changes, and participation rates, save their scenarios, and use Gemini to visualize what a society meeting these targets might look like.",
+  "requestFramePermissions": []
+}
