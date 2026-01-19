@@ -32,7 +32,6 @@ export const FutureImaginator: React.FC<FutureImaginatorProps> = ({ countryName,
         genre,
       });
     } catch (e) {
-      // FIX: Update error message to not mention API keys, as per Gemini API guidelines.
       setError('Sorry, there was an error imagining this future. Please try again.');
     } finally {
       setIsLoading(false);
@@ -40,9 +39,8 @@ export const FutureImaginator: React.FC<FutureImaginatorProps> = ({ countryName,
   }, [genre, countryName, personalTarget, onAddStory]);
 
   const handleCopy = (story: GeneratedStory) => {
-    // FIX: Use marked.parseSync for synchronous conversion.
-    // FIX: The method `parseSync` does not exist on the imported `marked` object. Using `marked.parse` instead.
-    const plainText = new DOMParser().parseFromString(marked.parse(story.text), 'text/html').body.textContent || "";
+    // Strip HTML for copy to clipboard
+    const plainText = new DOMParser().parseFromString(marked.parse(story.text) as string, 'text/html').body.textContent || "";
     navigator.clipboard.writeText(plainText);
     setCopiedId(story.id);
     setTimeout(() => setCopiedId(null), 2000);
@@ -75,9 +73,7 @@ export const FutureImaginator: React.FC<FutureImaginatorProps> = ({ countryName,
                   <button onClick={() => onDeleteStory(story.id)} className="text-sm font-medium text-rose-500 hover:text-rose-700">Delete</button>
                 </div>
             </div>
-            {/* FIX: Use marked.parseSync for synchronous conversion needed by React. */}
-            {/* FIX: The method `parseSync` does not exist on the imported `marked` object. Using `marked.parse` instead. */}
-            <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: marked.parse(story.text) }} />
+            <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: marked.parse(story.text) as string }} />
           </div>
         )) : (
           <div className="text-center text-slate-500 py-8">

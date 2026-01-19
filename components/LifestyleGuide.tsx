@@ -1,6 +1,6 @@
 
 import React, { useMemo } from 'react';
-import { LIFESTYLE_DATA } from '../constants';
+import { LIFESTYLE_DATA } from '../data/facts';
 import { LifestyleCategory } from '../types';
 
 interface LifestyleGuideProps {

@@ -1,6 +1,7 @@
+
 import React, { useState, useMemo, useRef } from 'react';
 import { Exploration } from '../types';
-import { COUNTRIES } from '../constants';
+import { COUNTRIES } from '../data/facts';
 
 interface ExplorationManagerProps {
   explorations: Exploration[];
@@ -43,7 +44,11 @@ export const ExplorationManager: React.FC<ExplorationManagerProps> = ({
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) { onImport(file); }
+    if (file) { 
+      onImport(file); 
+      // Reset input so the same file can be selected again if needed
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   const handleEdit = (exploration: Exploration) => {
