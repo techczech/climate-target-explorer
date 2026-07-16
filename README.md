@@ -1,3 +1,12 @@
+---
+name: "Climate Target Explorer"
+description: "An interactive web application to explore personal and collective carbon footprint targets required to meet the 1.5°C climate goal. Users can adjust parameters like country, structural changes, and participation rates, save their scenarios, and use Google Gemini to visualize what a society meeting these targets might look like."
+categories: [interactive-learning-objects, web-app, built-by-ai, powered-by-ai]
+updated: 2026-07-16
+deployments:
+  Appsite:
+    "Climate Target Explorer": https://climatetargetexplorer.edutools.fyi/
+---
 
 # Collective Climate Target Explorer
 
