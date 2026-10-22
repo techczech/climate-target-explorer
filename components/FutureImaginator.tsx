@@ -1,6 +1,6 @@
 
 import React, { useState, useCallback } from 'react';
-import { marked } from 'marked';
+import { renderStoryMarkdown } from '../services/storyMarkdown';
 import { generateStory } from '../services/geminiService';
 import { GeneratedStory } from '../types';
 
@@ -13,6 +13,7 @@ interface FutureImaginatorProps {
 }
 
 export const FutureImaginator: React.FC<FutureImaginatorProps> = ({ countryName, personalTarget, stories, onAddStory, onDeleteStory }) => {
+  const [apiKey, setApiKey] = useState('');
   const [genre, setGenre] = useState('Hopeful Solarpunk');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,22 +26,22 @@ export const FutureImaginator: React.FC<FutureImaginatorProps> = ({ countryName,
     const prompt = `You are a ${genre} author. Write a short story (around 300-400 words) set in ${countryName}. The story must reflect a world where the average person's lifestyle has a carbon footprint of ${personalTarget.toFixed(1)} tonnes. The story should be engaging and subtly incorporate details specific to ${countryName}'s culture or geography. The story must reveal what this society is like through its characters, setting, and plot, exploring aspects like how they travel, what they eat, what they value, and their relationship with technology and community. Do not explicitly mention "carbon footprints", "tonnes of CO2", or climate change jargon. Show, don't tell the reader about this lifestyle.`;
 
     try {
-      const generatedText = await generateStory(prompt);
+      const generatedText = await generateStory(prompt, apiKey);
       onAddStory({
         prompt,
         text: generatedText,
         genre,
       });
     } catch (e) {
-      setError('Sorry, there was an error imagining this future. Please try again.');
+      setError(e instanceof Error ? e.message : 'Gemini could not generate a story. Try again.');
     } finally {
       setIsLoading(false);
     }
-  }, [genre, countryName, personalTarget, onAddStory]);
+  }, [genre, countryName, personalTarget, onAddStory, apiKey]);
 
   const handleCopy = (story: GeneratedStory) => {
     // Strip HTML for copy to clipboard
-    const plainText = new DOMParser().parseFromString(marked.parse(story.text) as string, 'text/html').body.textContent || "";
+    const plainText = new DOMParser().parseFromString(renderStoryMarkdown(story.text), 'text/html').body.textContent || "";
     navigator.clipboard.writeText(plainText);
     setCopiedId(story.id);
     setTimeout(() => setCopiedId(null), 2000);
@@ -52,11 +53,17 @@ export const FutureImaginator: React.FC<FutureImaginatorProps> = ({ countryName,
       <p className="text-center text-slate-600 mb-6">Translate this target number into a vision of society. Generate one or more stories to explore the possibilities.</p>
       
       <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+        <div className="flex flex-col sm:flex-row gap-3 mb-3 sm:items-center">
+          <label htmlFor="story-api-key" className="text-sm font-medium text-slate-700">Gemini API key</label>
+          <input id="story-api-key" type="password" autoComplete="off" spellCheck={false} value={apiKey} onChange={event => setApiKey(event.target.value)} placeholder="Enter your own key for story generation" className="flex-1 min-w-0 border border-slate-300 rounded-lg p-2.5 text-sm" />
+          <button type="button" onClick={() => setApiKey('')} className="border border-slate-300 rounded-lg px-3 py-2.5 text-sm">Clear key</button>
+        </div>
+        <p className="text-sm text-slate-600 mb-4">Your key stays in this tab and is sent directly to Google for stories. Climate calculations, saved stories and exploration exports work without a key.</p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <select value={genre} onChange={(e) => setGenre(e.target.value)} className="bg-white border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full sm:w-auto p-2.5">
             <option>Hopeful Solarpunk</option><option>Sci-Fi</option><option>Social Drama</option><option>Alternate History</option><option>Children's Tale</option>
           </select>
-          <button onClick={handleGenerateStory} disabled={isLoading} className="bg-teal-600 text-white font-bold py-2.5 px-5 rounded-lg hover:bg-teal-700 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed w-full sm:w-auto">
+          <button onClick={handleGenerateStory} disabled={isLoading || !apiKey.trim()} className="bg-teal-600 text-white font-bold py-2.5 px-5 rounded-lg hover:bg-teal-700 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed w-full sm:w-auto">
             {isLoading ? 'Imagining...' : '+ Generate New Story'}
           </button>
         </div>
@@ -73,7 +80,7 @@ export const FutureImaginator: React.FC<FutureImaginatorProps> = ({ countryName,
                   <button onClick={() => onDeleteStory(story.id)} className="text-sm font-medium text-rose-500 hover:text-rose-700">Delete</button>
                 </div>
             </div>
-            <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: marked.parse(story.text) as string }} />
+            <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: renderStoryMarkdown(story.text) }} />
           </div>
         )) : (
           <div className="text-center text-slate-500 py-8">

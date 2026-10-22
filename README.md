@@ -46,13 +46,12 @@ This is a static web application that requires no backend server other than the 
 
 ### Requirements
 - A static file host (Vercel, Netlify, GitHub Pages, or a simple S3 bucket).
-- A valid Google Gemini API Key.
+- A visitor-supplied Google Gemini API key for optional story generation.
 
-### Build & Run
-Since the project uses ES Modules directly in the browser (via `importmap`), no build step (like Webpack or Vite) is strictly required for development if served over HTTP.
+## Independent static hosting
 
-For production, you can deploy the files directly to any static web server.
+Use Node 22.18 or newer. Run `npm ci`, `npm test`, `npm run typecheck` and `npm run build`. Host `dist/` on Cloudflare Pages or another static host with build command `npm run build`. No Cloud Run proxy, environment API key or server is required.
 
-### Environment Variables
-The application expects the Google Gemini API Key to be available in the environment as `API_KEY`. 
-*Note: In a client-side only deployment, ensure you restrict your API key's permissions to your specific domain to prevent unauthorized usage.*
+Climate calculations, saved explorations and imported stories work without a key. Optional story generation uses the visitor's own Gemini API key, entered in Imagine the Future. The key stays in memory for this tab and is never saved with an exploration. Clear key removes it. Generated and imported story Markdown is sanitised in both story views.
+
+Automated API tests use synthetic keys and mocked responses. No paid provider call or public deployment is part of this migration check. Changing the live address remains a separate release step.

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { marked } from 'marked';
+import { renderStoryMarkdown } from '../services/storyMarkdown';
 import { Exploration } from '../types';
 import { calculateTargets } from '../utils/calculations';
 import { LifestyleGuide } from './LifestyleGuide';
@@ -74,7 +74,7 @@ const ExplorationColumn: React.FC<{ exploration: Exploration }> = ({ exploration
             {exploration.stories.length > 0 ? exploration.stories.map(story => (
               <div key={story.id} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
                 <span className="text-sm font-semibold px-2 py-1 bg-teal-100 text-teal-800 rounded mb-2 inline-block">{story.genre}</span>
-                <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: marked.parse(story.text) as string }} />
+                <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: renderStoryMarkdown(story.text) }} />
               </div>
             )) : <p className="text-center text-slate-500 py-4">No stories generated.</p>}
         </div>
