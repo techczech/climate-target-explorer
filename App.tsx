@@ -1,3 +1,4 @@
+import { CiteThisPage } from './citation/CiteThisPage';
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { useExplorations } from './hooks/useExplorations';
@@ -184,6 +185,7 @@ const App: React.FC = () => {
         <footer className="text-center mt-12 text-sm text-slate-500">
           <p>This is a simplified tool for educational purposes, inspired by systems thinking in climate communication.</p>
           <p>Data is illustrative and based on various public sources for consumption-based emissions.</p>
+      <CiteThisPage />
         </footer>
       </main>
     </div>
